@@ -28,4 +28,7 @@ public class Staff extends Role {
         return "운영진";
     }
 
+    public String getPosition() {
+        return position;
+    }
 }

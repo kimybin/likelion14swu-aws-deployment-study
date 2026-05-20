@@ -36,4 +36,9 @@ public class Lion extends Role {
     public String roleName() {
         return "아기사자";
     }
+
+
+    public String getStudentId() {
+        return studendId;
+    }
 }
