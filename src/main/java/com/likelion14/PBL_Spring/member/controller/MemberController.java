@@ -25,23 +25,16 @@ public class MemberController {
     @Operation(summary = "Lion(아기사자) 등록")
     @PostMapping("/lions")
     public ResponseEntity<MemberResponse> createLion(@RequestBody LionCreateRequest request) {
-        Member member = memberService.createLion(request);
-        if(member == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(MemberResponse.from(member));
-
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(MemberResponse.from(memberService.createLion(request)));
     }
 
     // POST /members/staffs - Staffs 등록
     @Operation(summary = "Staff(운영진) 등록")
     @PostMapping("/staffs")
     public ResponseEntity<MemberResponse> createStaff(@RequestBody StaffCreateRequest request) {
-        Member member = memberService.createStaff(request);
-        if(member == null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(MemberResponse.from(member));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(MemberResponse.from(memberService.createStaff(request)));
     }
 
     // PUT /members/lions/{id} - Lion 수정
@@ -49,11 +42,8 @@ public class MemberController {
     @PutMapping("/lions/{id}")
     public ResponseEntity<MemberResponse> updateLion(@PathVariable Long id,
                                                    @RequestBody LionUpdateRequest request) {
-        Member updated = memberService.updateLion(id, request);
-        if(updated == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(MemberResponse.from(updated));
+
+        return ResponseEntity.ok(MemberResponse.from(memberService.updateLion(id, request)));
     }
 
     // PUT /members/staffs/{id} - Staff 수정
@@ -61,42 +51,50 @@ public class MemberController {
     @PutMapping("/staffs/{id}")
     public ResponseEntity<MemberResponse> updateStaff(@PathVariable Long id,
                                                    @RequestBody StaffUpdateRequest request) {
-        Member updated = memberService.updateStaff(id, request);
-        if(updated == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(MemberResponse.from(updated));
+
+        return ResponseEntity.ok(MemberResponse.from(memberService.updateStaff(id, request)));
     }
 
     // DELEE /members/{id} - 멤버 삭제
     @Operation(summary = "멤버 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
-        boolean sucess = memberService.deleteMember(id);
+        memberService.deleteMember(id);
 
-        if(!sucess) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.noContent().build();
     }
 
-    // 전체 멤버 조회 / id로 멤버 조회
-    // GET /members - 전체 조회
+    @Operation(summary = "전체 멤버 검색")
     @GetMapping
-    public ResponseEntity<List<MemberResponse>> getAllMemebers() {
-        List<MemberResponse> responses = memberService.getAllMembers().stream()
-                .map(MemberResponse::from)
-                .toList();
+    public ResponseEntity<List<MemberResponse>> getAllMembers(@RequestParam(required = false) String part) {
+        List<MemberResponse> responses;
+
+        if(part != null) {
+            responses = memberService.getMembersByPart(part).stream()
+                    .map(MemberResponse::from)
+                    .toList();
+        } else {
+            responses = memberService.getAllMembers().stream()
+                    .map(MemberResponse::from)
+                    .toList();
+        }
+
         return ResponseEntity.ok(responses);
     }
 
-    // GET /members/{id} - 단건 조회
+    // GET /members/{id} - member id로 단건 조회
+    @Operation(summary = "id로 멤버 검색")
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponse> getMember(@PathVariable Long id) {
-        Member member = memberService.findById(id);
-        if(member == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(MemberResponse.from(member));
+        return ResponseEntity.ok(MemberResponse.from(memberService.findById(id)));
     }
+
+    // GET /members/search - member 이름으로 단건 조회
+    @Operation(summary = "이름으로 멤버 검색")
+    @GetMapping("/search")
+    public ResponseEntity<?> searchByName(@RequestParam("name") String name) {
+        return ResponseEntity.ok(MemberResponse.from(memberService.searchByName(name)));
+    }
+
+
 }

@@ -1,5 +1,7 @@
 package com.likelion14.PBL_Spring.member.service;
 
+import com.likelion14.PBL_Spring.global.exception.AssignmentNotFoundException;
+import com.likelion14.PBL_Spring.global.exception.MemberNotFoundException;
 import com.likelion14.PBL_Spring.member.domain.Assignment;
 import com.likelion14.PBL_Spring.member.domain.Member;
 import com.likelion14.PBL_Spring.member.dto.AssignmentCreateRequest;
@@ -27,13 +29,13 @@ public class AssignmentService {
     // 과제 등록
     @Transactional
     public Assignment create(Long memberId, AssignmentCreateRequest request) {
-        Member member = memberRepository.findById(memberId).orElse(null);
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다. id: " + memberId));
 
-        if(member == null) {
-            return null;
-        }
+        Assignment assignment = new Assignment(
+                request.getTitle(), request.getDescription(), member
+        );
 
-        Assignment assignment = new Assignment(request.getTitle(), request.getDescription(), member);
         return assignmentRepository.save(assignment);
     }
 
@@ -44,33 +46,31 @@ public class AssignmentService {
 
     // 단건 조회
     public Assignment findById(Long id) {
-        return assignmentRepository.findById(id).orElse(null);
+        return assignmentRepository.findById(id)
+                .orElseThrow(() -> new AssignmentNotFoundException("해당 과제를 찾을 수 없습니다. id: " + id));
     }
 
-    // 수정
+    // 과제 수정
     @Transactional
     public Assignment update(Long id, AssignmentUpdateRequest request) {
-        Assignment assignment = assignmentRepository.findById(id).orElse(null);
-
-        if (assignment == null) {
-            return null;
-        }
+        Assignment assignment = assignmentRepository.findById(id)
+                .orElseThrow(() -> new AssignmentNotFoundException("해당 과제를 찾을 수 없습니다. id: " + id));
 
         assignment.updateInfo(request.getTitle(), request.getDescription());
         return assignmentRepository.save(assignment);
     }
 
-    // 삭제
+    // 과제 삭제
     @Transactional
-    public boolean delete(Long id) {
+    public void delete(Long id) {
         if(!assignmentRepository.existsById(id)) {
-            return false;
+            throw new AssignmentNotFoundException("해당 과제를 찾을 수 없습니다. id: " + id);
         }
         assignmentRepository.deleteById(id);
-        return true;
     }
 
     public List<Assignment> searchByTitle(String keyword) {
+
         return assignmentRepository.searchByTitle(keyword);
     }
 }
