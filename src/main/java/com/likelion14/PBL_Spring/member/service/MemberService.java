@@ -8,11 +8,13 @@ import com.likelion14.PBL_Spring.member.dto.*;
 import com.likelion14.PBL_Spring.member.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class MemberService {
     // private MemoryMemberRepository repository = new MemoryMemberRepository();
 
@@ -49,6 +51,7 @@ public class MemberService {
     }
 
     // 삭제
+    @Transactional
     public boolean deleteMember(Long id) {
         if(!repository.existsById(id)) {
             return false;
@@ -58,6 +61,7 @@ public class MemberService {
     }
 
     // Lion 등록
+    @Transactional
     public Member createLion(LionCreateRequest request) {
         if(repository.existsByName(request.getName())) {
             return null;
@@ -80,6 +84,7 @@ public class MemberService {
     }
 
     // Staff 등록
+    @Transactional
     public Member createStaff(StaffCreateRequest request) {
         if(repository.existsByName(request.getName())) {
             return null;
@@ -92,6 +97,7 @@ public class MemberService {
     }
 
     // Lion 수정
+    @Transactional
     public Member updateLion(Long id, LionUpdateRequest request) {
         Member member = repository.findById(id).orElse(null);
 
@@ -105,6 +111,7 @@ public class MemberService {
     }
 
     // Staff 수정
+    @Transactional
     public Member updateStaff(Long id, StaffUpdateRequest request) {
         Member member = repository.findById(id).orElse(null);
 
