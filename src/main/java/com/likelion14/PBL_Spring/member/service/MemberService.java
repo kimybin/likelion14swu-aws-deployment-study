@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,11 +25,13 @@ import java.util.stream.Collectors;
 public class MemberService {
     // 인터페이스에 의존 (구현체에 의존하지 않음)
     private final MemberRepository repository;
+    private final S3Service s3Service;
 
     // 생성자를 통해 의존성 주입
     @Autowired
-    public MemberService(MemberRepository repository) {
+    public MemberService(MemberRepository repository, S3Service s3Service) {
         this.repository = repository;
+        this.s3Service = s3Service;
     }
 
     // 이름으로 Member 조회
@@ -37,13 +40,10 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다. name: " + name));
     }
 
-    // 전체 member 조회
-    @Operation(summary = "전체 멤버 검색")
-    @GetMapping
-    public ResponseEntity<List<MemberResponse>> getAllMemebers(@RequestParam(required = false) String part) {
-        if(part != null )
+    // 전체 조회
+    public List<Member> getAllMembers() {
+        return repository.findAll();
     }
-    
 
     // ID로 Member 조회
     public Member findById(Long id) {
@@ -112,4 +112,15 @@ public class MemberService {
     public List<Member> getMembersByPart(String part) {
         return repository.findByPart(part);
     }
+
+    @Transactional
+    public Member updateProfileImage(Long id, MultipartFile file) {
+        Member member = repository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다. id: " + id));
+
+        String url = s3Service.uploadProfileImage(file);
+        member.updateProfileImageUrl(url);
+        return repository.save(member);
+    }
+
 }

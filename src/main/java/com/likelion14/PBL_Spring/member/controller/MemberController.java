@@ -6,8 +6,10 @@ import com.likelion14.PBL_Spring.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -94,6 +96,15 @@ public class MemberController {
     @GetMapping("/search")
     public ResponseEntity<?> searchByName(@RequestParam("name") String name) {
         return ResponseEntity.ok(MemberResponse.from(memberService.searchByName(name)));
+    }
+
+    @Operation(summary = "멤버 프로필 이미지 업로드")
+    @PostMapping(value = "/{id}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MemberResponse> uploadProfileImage(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+
+        return ResponseEntity.ok(MemberResponse.from(memberService.updateProfileImage(id, file)));
     }
 
 

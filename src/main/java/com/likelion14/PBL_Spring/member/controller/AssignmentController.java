@@ -63,11 +63,22 @@ public class AssignmentController {
         return ResponseEntity.noContent().build();
     }
 
+    // 과제 제목 검색
     @GetMapping("/assignments/search")
     public ResponseEntity<List<AssignmentResponse>> searchByTitle(@RequestParam String keyword) {
         List<AssignmentResponse> responses = assignmentService.searchByTitle(keyword).stream()
                 .map(AssignmentResponse::from)
                 .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    // 과제 제목 검색
+    @GetMapping("/assignments")
+    public ResponseEntity<List<AssignmentResponse>> getAllAssignments() {
+        List<AssignmentResponse> responses = assignmentService.findAll().stream()
+                .map(AssignmentResponse::from)
+                .toList();
+
         return ResponseEntity.ok(responses);
     }
 

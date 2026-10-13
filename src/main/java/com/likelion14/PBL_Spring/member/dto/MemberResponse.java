@@ -15,6 +15,7 @@ public class MemberResponse {
     private String roleName;
     private String studentId;
     private String position;
+    private String profileImageUrl;
 
     public static MemberResponse from(Member member) {
         MemberResponse response = new MemberResponse();
@@ -27,6 +28,7 @@ public class MemberResponse {
         response.roleName = member.getRoleType().getDisplayName(); // ?
         response.studentId = member.getStudentId();
         response.position = member.getPosition();
+        response.profileImageUrl = member.getProfileImageUrl();
 
         return response;
     }

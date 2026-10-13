@@ -10,6 +10,8 @@ import java.util.List;
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     List<Assignment> findByMemberId(Long memberId);
 
+    List<Assignment> findByTitleContaining(String keyword);
+
     @Query("select a from Assignment a where a.title like %:keyword%")
     List<Assignment> searchByTitle(@Param("keyword") String keyword);
 }

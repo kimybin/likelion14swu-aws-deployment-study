@@ -29,6 +29,8 @@ public class Member {
     private String studentId;
     private String position;
 
+    private String profileImageUrl;
+
     protected Member() {
     }
 
@@ -74,4 +76,8 @@ public class Member {
     // Member 엔티티에 양방향 관계 추가
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true) // 멤버 삭제 시 해당 멤버 과제도 같이 삭제되도록
     private List<Assignment> assignmentList = new ArrayList<>();
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

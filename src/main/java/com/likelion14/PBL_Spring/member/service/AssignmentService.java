@@ -69,8 +69,14 @@ public class AssignmentService {
         assignmentRepository.deleteById(id);
     }
 
+    // 과제 제목 검색
     public List<Assignment> searchByTitle(String keyword) {
-
-        return assignmentRepository.searchByTitle(keyword);
+        return assignmentRepository.findByTitleContaining(keyword);
     }
+
+    // 전체 조회
+    public List<Assignment> findAll() {
+        return assignmentRepository.findAll();
+    }
+
 }
