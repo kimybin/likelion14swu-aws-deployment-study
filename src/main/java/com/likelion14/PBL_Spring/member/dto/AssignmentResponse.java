@@ -13,28 +13,33 @@ public class AssignmentResponse {
     private final String description;
     private final Long memberId;
     private final String memberName;
+    private final Long viewCount;
 
     // 내부 생성자
-    private AssignmentResponse(Long id, String title, String description, Long memberId, String memberName) {
+    private AssignmentResponse(Long id, String title, String description, Long memberId, String memberName, Long viewCount) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.memberId = memberId;
         this.memberName = memberName;
+        this.viewCount = viewCount;
+
     }
 
-    // 엔티티를 DTO로 변환
-    // 정적 팩토리 메소드 from(): Assignment 엔티티에서 필요한 값을 꺼내와 내부 생성자를 호출하여 DTO에 전달
-    // DB에 저장된 원본 객체의 정보를 손상없이 클라이언트에게 전달
+    // 기존 from() — 목록 조회 등 조회수가 필요 없는 곳에서 사용
     public static AssignmentResponse from(Assignment assignment) {
+        return from(assignment, null);
+    }
+
+    // 조회수를 함께 담는 from()
+    public static AssignmentResponse from(Assignment assignment, Long viewCount) {
         return new AssignmentResponse(
                 assignment.getId(),
                 assignment.getTitle(),
                 assignment.getDescription(),
-
-                // memberId와 memberName은 Assignment가 참조하는 Member에서 가져옴
                 assignment.getMember() != null ? assignment.getMember().getId() : null,
-                assignment.getMember() != null ? assignment.getMember().getName() : null
+                assignment.getMember() != null ? assignment.getMember().getName() : null,
+                viewCount
         );
     }
 }
