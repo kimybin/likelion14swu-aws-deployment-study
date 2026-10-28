@@ -6,6 +6,8 @@ import com.likelion14.PBL_Spring.member.dto.AssignmentResponse;
 import com.likelion14.PBL_Spring.member.dto.AssignmentUpdateRequest;
 import com.likelion14.PBL_Spring.member.repository.AssignmentRepository;
 import com.likelion14.PBL_Spring.member.service.AssignmentService;
+import com.likelion14.PBL_Spring.member.service.ViewCountService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,11 @@ import java.util.List;
 @RestController
 public class AssignmentController {
     private final AssignmentService assignmentService;
+    private final ViewCountService viewCountService;
 
-    public AssignmentController(AssignmentService assignmentService) {
+    public AssignmentController(AssignmentService assignmentService, ViewCountService viewCountService) {
         this.assignmentService = assignmentService;
+        this.viewCountService = viewCountService;
     }
 
     // POST /members/{memberId}/assignments - 과제 등록
@@ -80,6 +84,14 @@ public class AssignmentController {
                 .toList();
 
         return ResponseEntity.ok(responses);
+    }
+
+    @Operation(summary = "id로 과제 조회")
+    @GetMapping("/{id}")
+    public ResponseEntity<AssignmentResponse> getAssignment(@PathVariable Long id) {
+        Assignment assignment = assignmentService.findById(id);   // 먼저 존재 확인
+        Long viewCount = viewCountService.increase(id);           // 그다음 조회수 증가
+        return ResponseEntity.ok(AssignmentResponse.from(assignment, viewCount));
     }
 
 
